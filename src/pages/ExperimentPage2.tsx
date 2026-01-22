@@ -1,20 +1,14 @@
-import { resetExperiment } from "../experiment/flow";
-import { useNavigate } from "react-router-dom";
+import ResetExperimentButton from "../components/ResetExperimentButton";
+import { EXPERIMENT_PAGE1_LOGS_KEY } from "../experiment/flow";
 
 const ExperimentPage2 = () => {
-  const navigate = useNavigate();
+  const data = localStorage.getItem(EXPERIMENT_PAGE1_LOGS_KEY);
+  const page1Logs = data ? JSON.parse(data) : null;
   return (
   <div>
     <h1>Experiment Page 2</h1>
-    <button
-         onClick={() => {
-          resetExperiment();
-          navigate("/");
-        }}
-         className="ml-4 cursor-pointer rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700"
-        >
-          Reset Experiment
-        </button>
+    <p> {page1Logs ? JSON.stringify(page1Logs) : "No logs available"} </p>
+    <ResetExperimentButton />
   </div>)
 }
 export default ExperimentPage2;
