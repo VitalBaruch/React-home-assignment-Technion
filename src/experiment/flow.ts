@@ -1,5 +1,23 @@
 const EXPERIMENT_STATE_KEY = "experiment.state"; // Key used in localStorage
-export const EXPERIMENT_PAGE1_LOGS_KEY = "experiment.page1.logs"; // Key for storing page 1 logs
+const EXPERIMENT_RUNS_KEY = "experiment.runs"; // Key for storing experiment runs
+
+
+export type ExperimentDraft = {
+    startedAtUTC: string;
+    firstClickTime: string | null;
+    clickLogs: ClickLog[];
+}
+
+// Type representing an experiment run
+export type ExperimentRun = {
+    id: string;
+    startedAtUTC: string;
+    completedAtUTC: string;
+    firstClickTime: string;
+    clickLogs: ClickLog[];
+}
+
+export type ExperimentRunsStore = ExperimentRun[];
 
 // Define possible flow states
 export const FLOW = {
@@ -28,11 +46,28 @@ export type ClickLog = {
   eventType: EventType;
 };
 
-// Type representing the logs from Page 1
-export type Page1Logs = {
-  firstClickTime: string | null;
-  clickLogs: ClickLog[];
-};
+export const setFlowState = (state: FlowState) => {
+    localStorage.setItem(EXPERIMENT_STATE_KEY, state);
+}
+
+export const getExperimentRuns = (): ExperimentRunsStore => {
+    const runsString = localStorage.getItem(EXPERIMENT_RUNS_KEY);
+    if (runsString) {
+        try {
+            const runs: ExperimentRunsStore = JSON.parse(runsString);
+            return runs;
+        } catch (error) {
+            return [];
+        }
+    }
+    return [];
+}
+
+export const saveExperimentRun = (run: ExperimentRun) => {
+    const runs = getExperimentRuns();
+    runs.push(run);
+    localStorage.setItem(EXPERIMENT_RUNS_KEY, JSON.stringify(runs));
+}
 
 export const getCurrentState = (): FlowState => {
     const state = localStorage.getItem(EXPERIMENT_STATE_KEY);
@@ -47,15 +82,23 @@ export const getCurrentState = (): FlowState => {
 }
 
 export const startExperiment = () => {
-    localStorage.setItem(EXPERIMENT_STATE_KEY, FLOW.PAGE1);
+    setFlowState(FLOW.PAGE1);
 }
 
-export const advanceToPage2 = (page1Logs: Page1Logs) => {
-    localStorage.setItem(EXPERIMENT_STATE_KEY, FLOW.PAGE2);
-    localStorage.setItem(EXPERIMENT_PAGE1_LOGS_KEY, JSON.stringify(page1Logs));
+export const advanceToPage2 = (experimentDraft: ExperimentDraft) => {
+    setFlowState(FLOW.PAGE2);
+    const currentExperiment = {
+        id: crypto.randomUUID(),
+        startedAtUTC: experimentDraft.startedAtUTC,
+        completedAtUTC: new Date().toISOString(),
+        firstClickTime: experimentDraft.firstClickTime!,
+        clickLogs: experimentDraft.clickLogs
+    };
+    saveExperimentRun(currentExperiment);
+    return currentExperiment.id;
 }
 
-export const resetExperiment = () => {
+export const resetAllExperiments = () => {
     localStorage.removeItem(EXPERIMENT_STATE_KEY);
-    localStorage.removeItem(EXPERIMENT_PAGE1_LOGS_KEY);
+    localStorage.removeItem(EXPERIMENT_RUNS_KEY);
 }

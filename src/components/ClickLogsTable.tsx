@@ -54,7 +54,7 @@ const ClickLogsTable = (props: { clickLogs: Array<ClickLog> }) => {
             id : 'timestamp',
             header: 'Timestamp UTC',
             accessorKey: 'timestamp',
-            cell: info => new Date(info.getValue<number>()).toISOString(),
+            cell: info => new Date(info.getValue<string>()).toISOString(),
         },
     ], []);
 
@@ -67,7 +67,7 @@ const ClickLogsTable = (props: { clickLogs: Array<ClickLog> }) => {
             row.original.event,
             new Date(row.original.timestamp).toISOString(),
             row.original.eventType,
-        ].join(" ").toLocaleLowerCase();
+        ].join(" ").toLowerCase();
         return rowStack.includes(search);
     }
 

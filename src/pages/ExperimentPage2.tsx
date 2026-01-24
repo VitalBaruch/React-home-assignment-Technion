@@ -1,46 +1,58 @@
 import { useEffect, useState } from "react";
-import ResetExperimentButton from "../components/ResetExperimentButton";
-import { EXPERIMENT_PAGE1_LOGS_KEY } from "../experiment/flow";
-import type { Page1Logs } from "../experiment/flow";
+import { useParams } from "react-router-dom";
+import { getExperimentRuns, type ExperimentRun } from "../experiment/flow";
 import ClicklogsTable from "../components/ClickLogsTable";
+import ReturnToHomePageButton from "../components/ReturnToHomePageButton";
 
 const ExperimentPage2 = () => {
+  const [experimentLogs, setExperimentLogs] = useState<ExperimentRun | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [page1Logs, setPage1Logs] = useState<Page1Logs | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { runId } = useParams();
 
   useEffect(() => {
-    const fetchPage1Logs = () => {
-      const logsString = localStorage.getItem(EXPERIMENT_PAGE1_LOGS_KEY);
-      if (logsString) {
-        try {
-          const logs: Page1Logs = JSON.parse(logsString);
-          setPage1Logs(logs);
-        } catch (error) {
-          console.error("Failed to parse page 1 logs:", error);
-        }
+    const fetchExperimentLogs = () => {
+      const runs = getExperimentRuns();
+      if (runs.length === 0) {
+        setLoading(false);
+        return;
       }
+      if (!runId) {
+        setLoading(false);
+        setError("Run ID is missing in URL parameters.");
+        return;
+      }
+      const currentRun = runs.find(run => run.id === runId);
+      if (!currentRun) {
+        setLoading(false);
+        setError(`No experiment run found with ID: ${runId}`);
+        return;
+      }
+      setExperimentLogs(currentRun ?? null);
       setLoading(false);
     };
 
-    fetchPage1Logs();
-  }, []);
+    fetchExperimentLogs();
+  }, [runId]);
 
   return (
   <div>
     <h1>Experiment Page 2</h1>
     {
-      loading ? (<p>Loading...</p>) : page1Logs === null ? (
-        <p>No logs found from Page 1.</p>
+      loading ? (<p>Loading...</p>) : error ? (
+        <p>{error}</p>
+      ) : experimentLogs === null ? (
+        <p>No logs found for this run.</p>
       ) : (
         <div>
-          <h2>Page 1 Logs</h2>
-          <p>First Click Time: {new Date(page1Logs.firstClickTime ?? 0).toISOString()}</p>
+          <h2>Experiment Logs</h2>
+          <p>First Click Time: {experimentLogs.firstClickTime ? new Date(experimentLogs.firstClickTime).toISOString() : "N/A"}</p>
           <h3>Click Logs:</h3>
-          <ClicklogsTable clickLogs={page1Logs.clickLogs} />
+          <ClicklogsTable clickLogs={experimentLogs.clickLogs} />
         </div>
       )
     }
-    <ResetExperimentButton />
+    <ReturnToHomePageButton />
   </div>)
 }
 export default ExperimentPage2;

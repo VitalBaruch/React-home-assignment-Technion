@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { advanceToPage2, EVENT } from "../experiment/flow";
-import { useState, useEffect } from "react";
-import ResetExperimentButton from "../components/ResetExperimentButton";
-import type { ClickLog, Page1Logs } from "../experiment/flow";
+import { useState, useEffect, useRef, useCallback } from "react";
+import type { ClickLog, ExperimentDraft } from "../experiment/flow";
+import ReturnToHomePageButton from "../components/ReturnToHomePageButton";
 
 // Constants for Experiment Page 1
 const EXPERIMENT_IMAGE_1_URL = "/experiment_image_1.png";
@@ -45,30 +45,64 @@ const RandomWordButtons = (props: {wordsArray: string[], onClick: (log: ClickLog
 }
 // end of Experiment Page 1 components
 
+// Custom hook to warn user before Refresh/Close
+const useWarnBeforeLeave = () => {
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+}
+
 // Main component for Experiment Page 1
 const ExperimentPage1 = () => {
   const [wordsArray, setWordsArray] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [logs, setLogs] = useState<Page1Logs>({firstClickTime: null, clickLogs: []});
-
-
+  
+  const experimentDraft = useRef<ExperimentDraft|null>(null);
   const navigate = useNavigate();
-  const logEvent = (log: ClickLog) => {
-    setLogs(prevLogs => ({...prevLogs, clickLogs: [...prevLogs.clickLogs, log]}));
-  };
-  const addFirstClick = () => {
-    if (logs.firstClickTime === null) {
-      setLogs(prevLogs => ({...prevLogs, firstClickTime: new Date().toISOString()}));
-    }
-  };
-  const submitHandler = () => {
-    // Add a final log entry for submission avoiding async state update issues
-    const submitLog: ClickLog = {timestamp: new Date().toISOString(), event: "Submit", eventType: EVENT.SUBMIT};
-    const finalLogs: Page1Logs = {firstClickTime: logs.firstClickTime, clickLogs: [...logs.clickLogs, submitLog]};
-    advanceToPage2(finalLogs);
-    navigate("/experiment2");
+
+  useWarnBeforeLeave();
+
+  // Using a ref to hold logs to avoid re-renders on each log addition
+  if (experimentDraft.current === null) {
+    experimentDraft.current = {
+      startedAtUTC: new Date().toISOString(),
+      firstClickTime: null,
+      clickLogs: []
+    };
   }
+
+  const logEvent = useCallback((log: ClickLog) => {
+    experimentDraft.current?.clickLogs.push(log);
+  }, []);
+
+  const addFirstClick = useCallback(() => {
+    if (experimentDraft.current?.firstClickTime === null) {
+      experimentDraft.current.firstClickTime = new Date().toISOString();
+    }
+  }, []);
+
+  const submitHandler = useCallback(() => {
+    // Ensure firstClickTime is set if first click is the submit button
+    if (experimentDraft.current?.firstClickTime === null) {
+      experimentDraft.current.firstClickTime = new Date().toISOString();
+    }
+    // Add a final log entry for submission
+    experimentDraft.current?.clickLogs.push({
+      timestamp: new Date().toISOString(),
+      event: "Submit",
+      eventType: EVENT.SUBMIT
+    });
+    const runId = advanceToPage2(experimentDraft.current!);
+    navigate(`/experiment2/${runId}`);
+  }, [navigate]);
+
   const fetchWords = async () => {
     setIsLoading(true);
     setError(null);
@@ -102,14 +136,14 @@ const ExperimentPage1 = () => {
   if (isLoading) {
     return (<div>
       <h1 className="text-xl font-semibold"> Loading... </h1>
-      <ResetExperimentButton />
+      <ReturnToHomePageButton />
     </div>);
   }
   
   if (error) {
     return (<div>
       <h1 className="text-xl font-semibold"> error fetching words: {error} </h1>
-      <ResetExperimentButton />
+      <ReturnToHomePageButton />
       <button onClick={async () => {
         await fetchWords();
       }} className="cursor-pointer ml-4 rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-700">
@@ -124,7 +158,7 @@ const ExperimentPage1 = () => {
     <Likert scaleSize={LIKERT_SCALE_SIZE} onClick={logEvent} />
     <RandomWordButtons wordsArray={wordsArray} onClick={logEvent} />
     <div className="mt-8 flex items-center">
-      <ResetExperimentButton />
+      <ReturnToHomePageButton />
       <button
       onClick={submitHandler}
       className="cursor-pointer ml-4 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
