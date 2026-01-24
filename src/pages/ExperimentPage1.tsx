@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { advanceToPage2 } from "../experiment/flow";
+import { advanceToPage2, EVENT } from "../experiment/flow";
 import { useState, useEffect } from "react";
 import ResetExperimentButton from "../components/ResetExperimentButton";
 import type { ClickLog, Page1Logs } from "../experiment/flow";
@@ -18,7 +18,7 @@ const Likert = (props: {scaleSize: number, onClick: (log: ClickLog) => void}) =>
         <div key={index} className="flex flex-col items-center">
           <button 
           className="cursor-pointer rounded-full bg-gray-200 px-4 py-2 font-bold text-gray-700 hover:bg-gray-300"
-          onClick={() => props.onClick({timestamp: new Date().toISOString(), event: (index + 1).toString()})}  
+          onClick={() => props.onClick({timestamp: new Date().toISOString(), event: (index + 1).toString(), eventType: EVENT.LIKERT_CLICK})}  
           >
             {index + 1}
           </button>
@@ -35,7 +35,7 @@ const RandomWordButtons = (props: {wordsArray: string[], onClick: (log: ClickLog
         <button 
         key={index} 
         className="cursor-pointer rounded bg-gray-200 px-4 py-2 font-bold text-gray-700 hover:bg-gray-300"
-        onClick={() => props.onClick({timestamp: new Date().toISOString(), event: word})}
+        onClick={() => props.onClick({timestamp: new Date().toISOString(), event: word, eventType: EVENT.RANDOM_WORD_CLICK})}
         >
           {word}
         </button>
@@ -64,7 +64,7 @@ const ExperimentPage1 = () => {
   };
   const submitHandler = () => {
     // Add a final log entry for submission avoiding async state update issues
-    const submitLog: ClickLog = {timestamp: new Date().toISOString(), event: "Submit"};
+    const submitLog: ClickLog = {timestamp: new Date().toISOString(), event: "Submit", eventType: EVENT.SUBMIT};
     const finalLogs: Page1Logs = {firstClickTime: logs.firstClickTime, clickLogs: [...logs.clickLogs, submitLog]};
     advanceToPage2(finalLogs);
     navigate("/experiment2");
