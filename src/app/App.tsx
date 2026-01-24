@@ -3,10 +3,12 @@ import router from "./router";
 
 const App = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <RouterProvider router={router}/>
+  <div className="min-h-screen bg-gray-50">
+    <div className="mx-auto w-full max-w-5xl p-6">
+      <RouterProvider router={router} />
     </div>
-  )
+  </div>
+  );
 }
 
 export default App;

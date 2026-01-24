@@ -13,16 +13,26 @@ const RANDOM_WORD_API_URL = `https://random-word-api.herokuapp.com/word?number=$
 // Components for Experiment Page 1
 const Likert = (props: {scaleSize: number, onClick: (log: ClickLog) => void}) => {
   return (
-    <div className="flex justify-center space-x-4">
+    <div className="flex flex-wrap justify-center gap-3">
       {[...Array(props.scaleSize)].map((_, index) => (
-        <div key={index} className="flex flex-col items-center">
-          <button 
-          className="cursor-pointer rounded-full bg-gray-200 px-4 py-2 font-bold text-gray-700 hover:bg-gray-300"
+          <button key={index} 
+          className="
+            cursor-pointer
+            inline-flex items-center justify-center
+            h-10 w-10
+            rounded-full
+            border border-gray-300 bg-white
+            text-sm font-semibold text-gray-900
+            shadow-sm
+            transition
+            hover:bg-gray-100
+            active:scale-95 active:bg-gray-200
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900/20
+          "
           onClick={() => props.onClick({timestamp: new Date().toISOString(), event: (index + 1).toString(), eventType: EVENT.LIKERT_CLICK})}  
           >
             {index + 1}
           </button>
-        </div>
       ))}
     </div>
   )
@@ -30,11 +40,23 @@ const Likert = (props: {scaleSize: number, onClick: (log: ClickLog) => void}) =>
 
 const RandomWordButtons = (props: {wordsArray: string[], onClick: (log: ClickLog) => void}) => {
   return (
-    <div className="mt-4 flex justify-center space-x-4">
+    <div className="mt-3 flex flex-wrap justify-center gap-3">
       {props.wordsArray.map((word, index) => (
         <button 
         key={index} 
-        className="cursor-pointer rounded bg-gray-200 px-4 py-2 font-bold text-gray-700 hover:bg-gray-300"
+        className="
+          cursor-pointer
+          inline-flex items-center justify-center
+          rounded-xl
+          border border-gray-200 bg-white
+          px-4 py-2
+          text-sm font-semibold text-gray-900
+          shadow-sm
+          transition
+          hover:bg-gray-100
+          active:scale-95 active:bg-gray-200
+          focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900/20
+        "
         onClick={() => props.onClick({timestamp: new Date().toISOString(), event: word, eventType: EVENT.RANDOM_WORD_CLICK})}
         >
           {word}
@@ -152,19 +174,50 @@ const ExperimentPage1 = () => {
     </div>);
   }
   return (
-  <div className="flex flex-col items-center justify-center p-8" onPointerDown={addFirstClick}>
-    <h1 className="text-2xl font-bold mb-4">Experiment Page 1</h1>
-    <img src={EXPERIMENT_IMAGE_1_URL} alt="Experiment 1" className="mb-4 w-1/4 " />
-    <Likert scaleSize={LIKERT_SCALE_SIZE} onClick={logEvent} />
-    <RandomWordButtons wordsArray={wordsArray} onClick={logEvent} />
-    <div className="mt-8 flex items-center">
+  <div className="mx-auto flex max-w-5xl flex-col gap-6" onPointerDown={addFirstClick}>
+    <div className="flex flex-col gap-1">
+      <h1 className="text-2xl font-semibold text-gray-900"> Experiment page </h1>
+      <p className="text-sm text-gray-600">
+         Interact with buttons. All clicks are recorded (UTC timestamps).
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">  
+
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <h2 className="text-sm font-semibold text-gray-900">Stimulus</h2>
+          <div className="mt-3 overflow-hidden rounded-xl border border-gray-200 bg-white">
+            <img src={EXPERIMENT_IMAGE_1_URL} alt="Experiment 1" className="h-72 w-full object-cover" />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <h2 className="text-sm font-semibold text-gray-900">Interactions</h2>
+          <div className="mt-4 flex flex-col gap-6">
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <div className="mb-2 text-sm font-medium text-gray-700">Likert</div>
+              <Likert scaleSize={LIKERT_SCALE_SIZE} onClick={logEvent} />
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <div className="mb-2 text-sm font-medium text-gray-700">Random words</div>
+              <RandomWordButtons wordsArray={wordsArray} onClick={logEvent} />
+            </div> 
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div className="flex justify-end gap-3">
       <ReturnToHomePageButton />
       <button
-      onClick={submitHandler}
-      className="cursor-pointer ml-4 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
-        Submit
+        onClick={submitHandler}
+        className="rounded-xl bg-gray-900 px-5 py-2 text-sm font-semibold text-white hover:bg-gray-800">
+          Submit
       </button>
-    </div>
+    </div>  
   </div>);
 }
 

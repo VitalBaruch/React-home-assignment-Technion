@@ -89,59 +89,83 @@ const ClickLogsTable = (props: { clickLogs: Array<ClickLog> }) => {
     });
 
   return (
-    <div>
-        <label className="text-sm text-gray-600">Filter by type:</label>
-        <select
-            className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
-            value={(table.getColumn("eventType")?.getFilterValue() as string) ?? ""}
-            onChange={(e) => table.getColumn("eventType")?.setFilterValue(e.target.value)}
-        >
-            <option value="">All</option>
-            <option value={EVENT.LIKERT_CLICK}>LIKERT_CLICK</option>
-            <option value={EVENT.RANDOM_WORD_CLICK}>RANDOM_WORD_CLICK</option>
-            <option value={EVENT.SUBMIT}>SUBMIT</option>
-        </select>
-        <input
-            type="text"
-            placeholder="Global Search..."
-            className="ml-4 rounded-md border border-gray-300 px-2 py-1 text-sm"
-            value={globalFilter ?? ""}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-        />
-        <table className="min-w-full border-collapse border border-gray-300 text-center">
-            <thead className="bg-gray-200">
-            {table.getHeaderGroups().map(headerGroup => (
-                <tr key={headerGroup.id} className="border border-gray-300">
-                {headerGroup.headers.map(header => (
-                    <th key={header.id} className="border border-gray-300">
-                    <button
-                    key={header.id}
-                    className="border border-gray-300 p-2 w-full"
-                    onClick={header.column.getToggleSortingHandler()}
-                    >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {{
-                            asc: ' 🔼',
-                            desc: ' 🔽',
-                        }[header.column.getIsSorted() as string] ?? null}
-                    </button>
-                    </th>
-                ))}
-                </tr>
-            ))}
-            </thead>
-            <tbody className="border border-gray-300">
-            {table.getRowModel().rows.map(row => (
-                <tr key={row.id} className={`border border-gray-300 ${rowTone(row.original.eventType)}`}>
-                {row.getVisibleCells().map(cell => (
-                    <td key={cell.id} className="border border-gray-300 p-2">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                ))}
-                </tr>
-            ))}
-            </tbody>
-        </table>
+    <div className="flex flex-col gap-4">
+
+        <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <span className="text-sm font-medium text-gray-700">Event type</span>
+                <select
+                    className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
+                    value={(table.getColumn("eventType")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("eventType")?.setFilterValue(e.target.value)}
+                >
+                <option value="">All</option>
+                <option value={EVENT.LIKERT_CLICK}>LIKERT_CLICK</option>
+                <option value={EVENT.RANDOM_WORD_CLICK}>RANDOM_WORD_CLICK</option>
+                <option value={EVENT.SUBMIT}>SUBMIT</option>
+                </select>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <span className="text-sm font-medium text-gray-700">Search</span>
+                <input
+                    type="text"
+                    placeholder="Global Search..."
+                    className="ml-4 rounded-md border border-gray-300 px-2 py-1 text-sm"
+                    value={globalFilter ?? ""}
+                    onChange={(e) => setGlobalFilter(e.target.value)}
+                />
+            </div>
+        </div>
+
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="max-h-130 overflow-auto">
+                <table className="min-w-full border-collapse text-left text-sm">
+                    <thead className="sticky top-0 z-10 bg-gray-50">
+                    {table.getHeaderGroups().map(headerGroup => (
+                        <tr key={headerGroup.id} className="border-b border-gray-200">
+                        {headerGroup.headers.map(header => (
+                            <th key={header.id} className="px-4 py-3 font-semibold text-gray-900">
+                            <button
+                            key={header.id}
+                            className="flex w-full items-center justify-between gap-2 text-left"
+                            onClick={header.column.getToggleSortingHandler()}
+                            >
+                                <span>
+                                    {flexRender(header.column.columnDef.header, header.getContext())}
+                                 </span>
+
+                                <span className="text-xs text-gray-500">
+                                    {{
+                                    asc: "▲",
+                                    desc: "▼",
+                                    }[header.column.getIsSorted() as string] ?? ""}
+                                </span>
+                            </button>
+                            </th>
+                        ))}
+                        </tr>
+                    ))}
+                    </thead>
+                    <tbody className="border border-gray-300">
+                    {table.getRowModel().rows.map(row => (
+                        <tr key={row.id} 
+                        className={[
+                            "border-b border-gray-100",
+                            rowTone(row.original.eventType),
+                            "hover:bg-gray-50/60",
+                            ].join(" ")}
+                        >
+                        {row.getVisibleCells().map(cell => (
+                            <td key={cell.id} className="px-4 py-3 text-gray-800 border-l border-gray-200">
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </td>
+                        ))}
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
   );
 }
