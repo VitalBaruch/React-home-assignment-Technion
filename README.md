@@ -1,73 +1,56 @@
-# React + TypeScript + Vite
+# React Experiment – Technion Home Assignment
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based experiment application built with **React + TypeScript**.  
+The system guides users through a controlled, forward-only experiment flow, logs interactions, and stores completed runs locally in the browser.
 
-Currently, two official plugins are available:
+All timestamps are recorded in **UTC**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 📌 Project Overview
+This project implements a simple in-browser experiment system consisting of:
+- A home page displaying previously completed experiment runs.
+- A two-step experiment flow:
+  - **Page 1**: stimulus display, Likert-scale input, random-word buttons, and click logging.
+  - **Page 2**: results view with a table of recorded events (click events).
+- Forward-only navigation enforced during the experiment to preserve data integrity.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+⚠️ **Experiment Flow Limitation**
 
-## Expanding the ESLint configuration
+Refreshing the browser or navigating away from the application during
+**Experiment Page 1** results in the loss of the current experiment state.
+Incomplete experiments are not persisted.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🧱 Tech Stack
+- **React** + **TypeScript**
+- **React Router**
+- **TanStack Table**
+- **Vite**
+- **Tailwind CSS**
+- **Docker**
+- **Nginx** (serving production build)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## ▶️ How to Run the Project
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 🔹 Run with Docker (Recommended – Production Setup)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+This is the recommended way to run the project, as it reflects the final
+production configuration (React production build served via Nginx).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+```bash
+# Clone the repository
+git clone https://github.com/VitalBaruch/React-home-assignment-Technion.git
+cd React-home-assignment-Technion
+
+# Build Docker image
+docker build -t react-experiment .
+
+# Run Docker container
+docker run --rm -p 8080:80 react-experiment
+
+# Open in browser
+http://localhost:8080

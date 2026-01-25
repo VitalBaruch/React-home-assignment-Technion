@@ -14,7 +14,7 @@ const RANDOM_WORD_API_URL = `https://random-word-api.herokuapp.com/word?number=$
 const Likert = (props: {scaleSize: number, onClick: (log: ClickLog) => void}) => {
   return (
     <div className="flex flex-wrap justify-center gap-3">
-      {[...Array(props.scaleSize)].map((_, index) => (
+      {Array.from({ length: props.scaleSize }).map((_, index) => (
           <button key={index} 
           className="
             cursor-pointer
