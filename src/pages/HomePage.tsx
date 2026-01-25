@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FLOW, getCurrentState, getExperimentRuns, resetAllExperiments, setFlowState, startExperiment, type ExperimentRunsStore } from "../experiment/flow";
+import { deleteExperimentRun, FLOW, getCurrentState, getExperimentRuns, resetAllExperiments, setFlowState, startExperiment, type ExperimentRunsStore } from "../experiment/flow";
 import { useEffect, useState } from "react";
 
 const HomePage = () => {
@@ -82,15 +82,29 @@ const HomePage = () => {
                   <div><span className="font-semibold">Completed (UTC):</span> {run.completedAtUTC}</div>
                 </div>
 
-                <button
-                  className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
-                  onClick={() => {
-                    setFlowState(FLOW.PAGE2);
-                    navigate(`/experiment2/${run.id}`);
-                  }}
-                >
-                  View results
+                <div className="flex gap-2">
+                  <button
+                    className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+                    onClick={() => {
+                      setFlowState(FLOW.PAGE2);
+                      navigate(`/experiment2/${run.id}`);
+                    }}
+                  >
+                    View results
+                  </button>
+                  <button
+                    onClick={() => {
+                      const updatedRuns = deleteExperimentRun(run.id);
+                      if (updatedRuns !== undefined) {
+                        setExperiments(updatedRuns);
+                      }
+                    }}
+                    className="rounded-xl border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50"
+                  >
+                  Delete
                 </button>
+              </div>
+
               </div>
             </li>
           ))}

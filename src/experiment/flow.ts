@@ -102,3 +102,14 @@ export const resetAllExperiments = () => {
     localStorage.removeItem(EXPERIMENT_STATE_KEY);
     localStorage.removeItem(EXPERIMENT_RUNS_KEY);
 }
+
+export const deleteExperimentRun = (id: string) => {
+    const confirmed = window.confirm("Are you sure you want to delete this experiment run? This action cannot be undone.");
+    if (!confirmed) {
+        return undefined;
+    }
+    const runs = getExperimentRuns();
+    const updatedRuns = runs.filter(run => run.id !== id);
+    localStorage.setItem(EXPERIMENT_RUNS_KEY, JSON.stringify(updatedRuns));
+    return updatedRuns;
+}

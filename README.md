@@ -104,10 +104,12 @@ http://localhost:8080
 
 ## Architecture / Design Decisions
 
-- Forward-only flow: experiment routes are guarded to prevent navigating backwards during an active experiment (home is allowed).
-- Persistence: completed experiment runs are stored locally in the browser, allowing review of previous results without a backend.
-- UTC timestamps: all recorded timestamps use new Date().toISOString() to ensure timezone-independent logging.
-- Serving strategy: the production build is served via Nginx, including SPA fallback to support React Router deep links and refresh.
+- **Forward-only flow:** experiment routes are guarded to prevent backward navigation during an active experiment (returning to the Home page is allowed).
+- **Persistence:** completed experiment runs are stored locally in the browser, allowing users to review previous results without requiring a backend.
+- **UTC timestamps:** all recorded timestamps use `new Date().toISOString()` to ensure timezone-independent logging.
+- **Serving strategy:** the production build is served via **Nginx**, including a SPA fallback to support React Router deep links and page refresh.
+- **Enhanced table usability:** the results table supports column sorting (by clicking on headers), filtering, and free-text searching.
+- **Experiment management:** users can delete previously completed experiment runs directly from the Home page.
 
 ---
 
