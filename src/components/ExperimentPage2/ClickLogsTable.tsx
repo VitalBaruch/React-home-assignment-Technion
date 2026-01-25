@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EVENT, type ClickLog, type EventType } from "../experiment/flow";
+import { EVENT, type ClickLog, type EventType } from "../../experiment/flow";
 import type { ColumnDef, SortingState, ColumnFiltersState, FilterFn, Row } from "@tanstack/react-table";
 import { useReactTable, getCoreRowModel, flexRender, getSortedRowModel, getFilteredRowModel } from "@tanstack/react-table";
 
@@ -99,10 +99,13 @@ const ClickLogsTable = (props: { clickLogs: Array<ClickLog> }) => {
                     value={(table.getColumn("eventType")?.getFilterValue() as string) ?? ""}
                     onChange={(e) => table.getColumn("eventType")?.setFilterValue(e.target.value)}
                 >
-                <option value="">All</option>
-                <option value={EVENT.LIKERT_CLICK}>LIKERT_CLICK</option>
-                <option value={EVENT.RANDOM_WORD_CLICK}>RANDOM_WORD_CLICK</option>
-                <option value={EVENT.SUBMIT}>SUBMIT</option>
+                {
+                    ["", EVENT.LIKERT_CLICK, EVENT.RANDOM_WORD_CLICK, EVENT.SUBMIT].map((eventType) => (
+                        <option key={eventType} value={eventType}>
+                            {eventType === "" ? "All" : eventType}
+                        </option>
+                    ))
+                }
                 </select>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">

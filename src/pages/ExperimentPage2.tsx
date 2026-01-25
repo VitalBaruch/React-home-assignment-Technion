@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getExperimentRuns, type ExperimentRun } from "../experiment/flow";
-import ClicklogsTable from "../components/ClickLogsTable";
+import ClicklogsTable from "../components/ExperimentPage2/ClickLogsTable";
 import ReturnToHomePageButton from "../components/ReturnToHomePageButton";
 
 const ExperimentPage2 = () => {
