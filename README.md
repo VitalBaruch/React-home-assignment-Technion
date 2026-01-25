@@ -111,22 +111,6 @@ http://localhost:8080
 
 ---
 
-## Project Structure (Main Files)
-
-src/
- ├─ App.tsx
- ├─ router.tsx
- ├─ flow.ts
- ├─ pages/
- │   ├─ HomePage.tsx
- │   ├─ ExperimentPage1.tsx
- │   └─ ExperimentPage2.tsx
- └─ components/
-     ├─ ClickLogsTable.tsx
-     └─ ReturnToHomePageButton.tsx
-
----
-
 ## Notes & Assumptions
 
 - The application is fully client-side.
